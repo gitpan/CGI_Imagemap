@@ -1,0 +1,8 @@
+README
+Imagemap.pm
+MANIFEST
+Makefile.PL
+test.pl
+example/testbar.gif
+example/testmap
+example/testmap.old

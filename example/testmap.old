@@ -1,0 +1,102 @@
+#!/usr/bin/perl -w
+#
+# testmap - example for CGI::Imagemap module
+#
+# Usage:  http://SERVER/cgi-bin/testmap
+#
+# $Id: testmap.old,v 1.1 1996/03/02 06:38:09 mike Exp $
+#
+# Returns a form if sent no post or query.  If receives
+# the proper form, will use the CGI::Imagemap module to
+# determine the coordinates that were clicked.
+#
+# This is the old version that requires cgi-lib.pl
+#
+
+
+use Imagemap;
+require "cgi-lib.pl";
+
+ReadParse();
+
+# Print our form unless it is a response
+unless (defined $in{'ourform'}) {
+
+	print <<EOF;
+Content-type: text/html
+
+<HEAD>
+	<TITLE>Imagemap tester</TITLE>
+</HEAD>
+<BODY>
+<H2> Click on the image to test me...</H2>
+<FORM ACTION="$ENV{SCRIPT_NAME}" METHOD="POST">
+<INPUT TYPE="HIDDEN" NAME="ourform" VALUE="yes">
+<INPUT TYPE="IMAGE" NAME="action" SRC="/artbar1.gif">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="rect test1 148,0 223,20">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="rect test2 231,0 289,20">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="rect test3 296,0 346,20">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="rect test4 354,0 422,20">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="default default">
+<P>
+<INPUT TYPE="CHECKBOX" NAME="debug"> Print map and inputs
+</FORM>
+</BODY>
+EOF
+
+exit;
+
+}
+
+# If we got here, we are processing a response
+		
+	print <<EOF;
+Content-type: text/html
+
+<HEAD>
+	<TITLE>Imagemap tester output</TITLE>
+</HEAD>
+<BODY>
+<H2> You clicked...</H2>
+EOF
+
+if (		defined $in{'action.x'} &&
+			defined $in{'action.y'} &&
+			defined $in{'action.map'}	) {
+
+	$x = $in{'action.x'};
+	$y = $in{'action.y'};
+	$map = $in{'action.map'};
+	$todo = action_map($x,$y,$map);
+
+	print <<EOF;
+X coordinate was $x, Y coordinate was $y, action was $todo.<BR>
+EOF
+
+	# If the use clicked the debug box, then display this
+	if(defined $in{'debug'}) {
+		print <<EOF;
+<PRE>
+action.x: $in{'action.x'} action.y = $in{'action.y'}
+
+action.map (nulls turned into newlines):
+EOF
+
+		$map =~ s/\0/\n/g;
+		print $map;
+		print "</PRE>\n";
+	}
+
+}
+else {
+
+	print "NOTHING! That wasn't our form.\n";
+
+}
+print "</BODY>\n";
+

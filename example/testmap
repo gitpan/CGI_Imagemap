@@ -1,0 +1,115 @@
+#!/usr/bin/perl -wT
+#
+# testmap - example for CGI::Imagemap module
+#
+# Usage:  http://SERVER/cgi-bin/testmap
+#
+# $Id: testmap,v 1.1 1996/03/02 06:36:22 mike Exp $
+#
+# Returns a form if sent no post or query.  If receives
+# the proper form, will use the CGI::Imagemap module to
+# determine the coordinates that were clicked.
+#
+
+
+use CGI::Imagemap;
+use CGI::Form;
+
+$query = new CGI::Form;
+
+# Print our form unless it is a response
+unless (defined $query->param('ourform') ) {
+
+	$script = $query->cgi->{SCRIPT_NAME} || '';
+
+	print <<EOF;
+Content-type: text/html
+
+<HEAD>
+	<TITLE>Imagemap tester</TITLE>
+</HEAD>
+<BODY>
+<H2> Click on the image to test me...</H2>
+<FORM ACTION="$script" METHOD="POST">
+<INPUT TYPE="HIDDEN" NAME="ourform" VALUE="yes">
+<INPUT TYPE="IMAGE" NAME="action" SRC="/testbar.gif">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="rect test1 148,0 223,20">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="rect test2 231,0 289,20">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="rect test3 296,0 346,20">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="rect test4 354,0 422,20">
+<INPUT TYPE="HIDDEN" NAME="action.map"
+	VALUE="default default">
+<P>
+<INPUT TYPE="CHECKBOX" NAME="debug"> Print map and inputs
+</FORM>
+</BODY>
+EOF
+
+	exit;
+
+}
+
+# If we got here, we are processing a response
+		
+	my ($map, $x, $y, $todo);
+	print <<EOF;
+Content-type: text/html
+
+<HEAD>
+	<TITLE>Imagemap tester output</TITLE>
+</HEAD>
+<BODY>
+<H2> You clicked...</H2>
+EOF
+
+if (		defined ($x = $query->param('action.x')) and
+			defined ($y = $query->param('action.y')) and
+			defined (@map = $query->param('action.map')) ) {
+
+	# This is the static version, uncomment if you want to try
+	#map_untaint('yes');
+	#$todo = action_map($x,$y,@map);
+
+	# This is the class method version, comment it out if you want to try
+	# the static version
+	$map = new CGI::Imagemap;
+	$map->setmap(@map);
+	$map->untaint('yes');
+	$todo = $map->action($x, $y);
+
+
+	print <<EOF;
+X coordinate was $x, Y coordinate was $y, action was $todo.<BR>
+EOF
+
+	# If the use clicked the debug box, then display this
+	if(defined $query->param('debug')) {
+		print <<EOF;
+
+<PRE>
+action.x: $x action.y = $y
+
+action.map (nulls turned into newlines):
+EOF
+
+		for (@map) {
+			print "$_\n";
+		}
+		print "</PRE>\n";
+	}
+
+}
+else {
+
+	print "NOTHING! That wasn't our form.\n";
+	print "<PRE>\n";
+	print $query->dump;
+	print "</PRE>\n";
+
+}
+print "</BODY>\n";
+

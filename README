@@ -1,0 +1,80 @@
+$Id: README,v 1.1 1996/03/02 06:41:33 mike Exp $
+
+LEGALESE
+--------
+
+     Copyright (c) 1996 Mike Heins. All rights reserved.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+
+	You should have received a copy of the Perl license along with
+	Perl; see the file README in Perl distribution.
+ 
+	You should have received a copy of the GNU General Public License
+	along with Perl; see the file Copying.  If not, write to
+	the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+	You should have received a copy of the Artistic License
+	along with Perl; see the file Artistic.
+
+
+Author of this software makes no claim whatsoever about suitability,
+reliability, edability, editability or usability of this product, and
+should not be kept liable for any damage resulting from the use of
+it. If you can use it, you are in luck, if not, I should not be kept
+responsible. Keep a handy copy of your backup tape at hand.
+
+DESCRIPTION
+-----------
+This is a module designed to allow NCSA-style imagemap entries
+to reside in forms, triggered by a fill-out form TYPE=IMAGE field.
+
+It has both client-side and server-side capability, though at the
+present no function is provided to read an external mapfile. You
+could easily do it yourself with:
+
+	@map = `cat mapfile`;
+
+After installation, you should be able to access the documentation
+with the command:
+
+	perldoc CGI::Imagemap
+
+INSTALLATION
+------------
+To install this module type
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+EXAMPLES
+---------
+A couple of meager examples are in the directory example/.  To install,
+copy the testmap or testmap.old file to a script-aliased cgi-bin
+directory, copy the file testbar.gif to your document root (if desired,
+it will even work with the [BROKEN IMAGE]), and trigger the test by
+typing the URL into your browser.  You shouldn't have much trouble with
+this if you are wanting to use this module. 8-)
+
+AUTHOR
+------
+Mike Heins
+mikeh@iac.net
+
+Std dstribution site: http://www.iac.net/~mike/.  Will be submitted
+to CPAN by March 5, 1996.
+
+BUGS
+-----
+The untainting is set globally and reset when using class methods --
+this may break threaded applications.  I don't deem that too likely
+with CGIs, but you never know.
+
+CGI::Form and the other CGI modules redefine carp(), croak() and 
+confess(). This may cause warnings.  If so, you could comment out
+the 'use Carp;' in the module.  If anyone knows a better fix,
+let me know.
+
